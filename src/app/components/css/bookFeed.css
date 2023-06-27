@@ -1,0 +1,20 @@
+.bookRow{
+  display: flex;
+  flex-direction: row;
+}
+.blockColumn{
+  display: flex;
+  flex-direction: column;
+}
+.bookContainer{
+  background-color:  #FFFFFF;
+  margin-bottom: 30px;
+  width: 30vw;
+  margin: 10px auto;
+  padding: 15px;
+  color: #333333;
+}
+.buttonContainer{
+  display: flex;
+  flex-direction: row;
+}
