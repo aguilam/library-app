@@ -1,24 +1,26 @@
 'use client'
 import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
-
+import { Input,Button, Card, Skeleton } from 'antd';
+const { Meta } = Card;
 export default function BookFeed() {
-  let search = 'Собачье сердце'
+  let search = 'Гарри Поттер';
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
 
   const bookAdd = (Identifiers) => {
-    const isbn13 = isbnGet(Identifiers);
-    console.log('Добавлена книга:', isbn13);
-    setSchoolBooksIsbn(prevIsbns => [...prevIsbns, isbn13]);
+    console.log('Добавлена книга:', Identifiers);
+    setSchoolBooksIsbn(prevId => [...prevId, Identifiers]);
   };
+
   const isbnGet = (Identifiers) => {
     const isbn13 = Identifiers.find(
       identifier => identifier.type === "ISBN_13"
     )?.identifier;
     return isbn13;
   };
+
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -31,17 +33,17 @@ export default function BookFeed() {
     };
     fetchBooks();
   }, [search]);
-  
+
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
       const fetchSchoolBooks = async () => {
         try {
-          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${schoolBooksIsbn}&maxResults=10`);
+          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${schoolBooksIsbn.join('|')}&maxResults=${schoolBooksIsbn.length * 10}`);
           const data = await response.json();
           const items = data.items || [];
           setSchoolBooks(items);
           console.log('Текущие книгиIsbn:', schoolBooksIsbn);
-          console.log('Текущие книги:', items); // Исправлено: выводится обновленное значение
+          console.log('Текущие книги:', items);
         } catch (error) {
           console.error(error);
         }
@@ -49,43 +51,61 @@ export default function BookFeed() {
       fetchSchoolBooks();
     }
   }, [schoolBooksIsbn]);
-  
-  
+
   return (
     <div className="bookRow">
-      <div className="bookColumn">
-        {books.map(book => (
-          <div key={book.id} className="bookContainer">
-            {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail && (
-              <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
-            )}
-            <h2>{book.volumeInfo.title}</h2> 
-            {book.searchInfo && book.searchInfo.textSnippet && (
-              <p>{book.searchInfo.textSnippet}</p>
-            )}
-            <p>{book.volumeInfo.authors?.join(', ')}</p>
-            <div className="buttonContainer">
-              <button onClick={() => bookAdd(book.volumeInfo.industryIdentifiers)}>Добавить в список книг</button>
-            </div>
-          </div>
-        ))}
+      <div>
+        <Input placeholder="Basic usage"></Input>
       </div>
       <div className="bookColumn">
-        {Array.isArray(schoolBooks) && schoolBooks.map(book => (
-          <div key={book.id} className="bookContainer">
-            {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail && (
-              <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
-            )}
-            <h2>{book.volumeInfo.title}</h2> 
-            {book.searchInfo && book.searchInfo.textSnippet && (
-              <p>{book.searchInfo.textSnippet}</p>
-            )}
-            <p>{book.volumeInfo.authors?.join(', ')}</p>
-            <div className="buttonContainer">
-              <button onClick={() => bookAdd(book.volumeInfo.industryIdentifiers)}>Добавить в список книг</button>
-            </div>
-          </div>
-        ))}
+        {books.length > 0 ? (
+          books.map(book => (
+            <Card key={book.id} className="bookContainer">
+              {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail ? (
+                <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
+              ) : (
+                <Skeleton.Image />
+              )}
+              <Meta
+                title={book.volumeInfo.title}
+                description={book.searchInfo && book.searchInfo.textSnippet && (
+                  <p>{book.searchInfo.textSnippet}</p>
+                )}
+              />
+              <p>{book.volumeInfo.authors?.join(', ')}</p>
+              <div className="buttonContainer">
+                <Button type="primary" onClick={() => bookAdd(book.id)}>Добавить в список книг</Button>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Skeleton active />
+        )}
+      </div>
+      <div className="bookColumn">
+        {Array.isArray(schoolBooks) && schoolBooks.length > 0 ? (
+          schoolBooks.map(book => (
+            <Card key={book.id} className="bookContainer">
+              {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail ? (
+                <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
+              ) : (
+                <Skeleton.Image />
+              )}
+              <Meta
+                title={book.volumeInfo.title}
+                description={book.searchInfo && book.searchInfo.textSnippet && (
+                  <p>{book.searchInfo.textSnippet}</p>
+                )}
+              />
+              <p>{book.volumeInfo.authors?.join(', ')}</p>
+              <div className="buttonContainer">
+                <Button danger onClick={() => bookAdd(book.id)}>Удалить</Button>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Skeleton active />
+        )}
       </div>
     </div>
   );

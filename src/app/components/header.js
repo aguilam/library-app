@@ -1,22 +1,30 @@
-import React from 'react';
-import Link from 'next/link';
-
+"use client"
+import React, { useState } from 'react';
+import { Menu } from 'antd';
+const items = [
+  {
+    label: 'Navigation One',
+    key: 'mail',
+  },
+  {
+    label: 'Navigation Two',
+    key: 'app',
+  },
+  {
+    label: (
+      <a href="#" target="_blank" rel="noopener noreferrer">
+        Navigation Three
+      </a>
+    ),
+    key: 'alipay',
+  },
+];
 const Header = () => {
-  return (
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/">Главная</Link>
-          </li>
-          <li>
-            <Link href="/about">О нас</Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
-  );
+  const [current, setCurrent] = useState('mail');
+
+  return <Menu mode="horizontal" items={items} />;
 };
 
 export default Header;
+
 
