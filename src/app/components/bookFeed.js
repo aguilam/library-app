@@ -2,6 +2,7 @@
 import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Input,Button, Card, Skeleton } from 'antd';
+import SearchPanel from "./searchPanel";
 const { Meta } = Card;
 export default function BookFeed() {
   let search = 'Гарри Поттер';
@@ -24,9 +25,19 @@ export default function BookFeed() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${search}&maxResults=11`);
+        const response = await fetch(`https://openlibrary.org/search.json?q=${search}`);
         const data = await response.json();
-        setBooks(data.items);
+        const items = data.docs || [];
+        setBooks(items.map(item => ({
+          id: item.key,
+          volumeInfo: {
+            title: item.title,
+            authors: item.author_name,
+            searchInfo: item.searchInfo,
+            isbn: item.isbn && item.isbn[0],
+            coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
+          }
+        })));
       } catch (error) {
         console.error(error);
       }
@@ -38,10 +49,18 @@ export default function BookFeed() {
     if (schoolBooksIsbn.length > 0) {
       const fetchSchoolBooks = async () => {
         try {
-          const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${schoolBooksIsbn.join('|')}&maxResults=${schoolBooksIsbn.length * 10}`);
+          const response = await fetch(`https://openlibrary.org/search.json?q=${schoolBooksIsbn}`);
           const data = await response.json();
           const items = data.items || [];
-          setSchoolBooks(items);
+          setSchoolBooks(items.map(item => ({
+            id: item.key,
+            volumeInfo: {
+              title: item.title,
+              authors: item.author_name,
+              searchInfo: item.searchInfo,
+              coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
+            }
+          })));
           console.log('Текущие книгиIsbn:', schoolBooksIsbn);
           console.log('Текущие книги:', items);
         } catch (error) {
@@ -55,17 +74,13 @@ export default function BookFeed() {
   return (
     <div className="bookRow">
       <div>
-        <Input placeholder="Basic usage"></Input>
+        <SearchPanel></SearchPanel>
       </div>
       <div className="bookColumn">
         {books.length > 0 ? (
           books.map(book => (
-            <Card key={book.id} className="bookContainer">
-              {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail ? (
-                <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
-              ) : (
-                <Skeleton.Image />
-              )}
+            <Card key={book.isbn} className="bookContainer">
+              <img src={book.volumeInfo.coverUrl} alt={book.volumeInfo.title} />
               <Meta
                 title={book.volumeInfo.title}
                 description={book.searchInfo && book.searchInfo.textSnippet && (
@@ -74,7 +89,7 @@ export default function BookFeed() {
               />
               <p>{book.volumeInfo.authors?.join(', ')}</p>
               <div className="buttonContainer">
-                <Button type="primary" onClick={() => bookAdd(book.id)}>Добавить в список книг</Button>
+                <Button type="primary" onClick={() => bookAdd(book.isbn)}>Добавить в список книг</Button>
               </div>
             </Card>
           ))
@@ -86,11 +101,7 @@ export default function BookFeed() {
         {Array.isArray(schoolBooks) && schoolBooks.length > 0 ? (
           schoolBooks.map(book => (
             <Card key={book.id} className="bookContainer">
-              {book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail ? (
-                <img src={book.volumeInfo.imageLinks.thumbnail} alt="Обложка книги" />
-              ) : (
-                <Skeleton.Image />
-              )}
+              <img src={book.volumeInfo.coverUrl} alt={book.volumeInfo.title} />
               <Meta
                 title={book.volumeInfo.title}
                 description={book.searchInfo && book.searchInfo.textSnippet && (
@@ -99,7 +110,7 @@ export default function BookFeed() {
               />
               <p>{book.volumeInfo.authors?.join(', ')}</p>
               <div className="buttonContainer">
-                <Button danger onClick={() => bookAdd(book.id)}>Удалить</Button>
+                <Button type="primary" onClick={() => bookAdd(book.isbn)}>Добавить в список книг</Button>
               </div>
             </Card>
           ))
