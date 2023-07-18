@@ -15,13 +15,6 @@ export default function BookFeed() {
     setSchoolBooksIsbn(prevId => [...prevId, Identifiers]);
   };
 
-  const isbnGet = (Identifiers) => {
-    const isbn13 = Identifiers.find(
-      identifier => identifier.type === "ISBN_13"
-    )?.identifier;
-    return isbn13;
-  };
-
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -30,13 +23,11 @@ export default function BookFeed() {
         const items = data.docs || [];
         setBooks(items.map(item => ({
           id: item.key,
-          volumeInfo: {
-            title: item.title,
-            authors: item.author_name,
-            searchInfo: item.searchInfo,
-            isbn: item.isbn && item.isbn[0],
-            coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
-          }
+          title: item.title,
+          authors: item.author_name,
+          searchInfo: item.searchInfo,
+          isbn: item.isbn && item.isbn[1],
+          coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
         })));
       } catch (error) {
         console.error(error);
@@ -49,27 +40,28 @@ export default function BookFeed() {
     if (schoolBooksIsbn.length > 0) {
       const fetchSchoolBooks = async () => {
         try {
-          const response = await fetch(`https://openlibrary.org/search.json?q=${schoolBooksIsbn}`);
-          const data = await response.json();
-          const items = data.items || [];
-          setSchoolBooks(items.map(item => ({
-            id: item.key,
-            volumeInfo: {
-              title: item.title,
-              authors: item.author_name,
-              searchInfo: item.searchInfo,
-              coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
-            }
-          })));
+          const bookPromises = schoolBooksIsbn.map(isbn => fetch(`https://openlibrary.org/search.json?q=${isbn}`).then(response => response.json()));
+          const bookData = await Promise.all(bookPromises);
+          const formattedBooks = bookData.map(item => ({
+            id: item.docs[0].key,
+            title: item.docs[0].title,
+            authors: item.docs[0].author_name,
+            searchInfo: item.docs[0].searchInfo,
+            coverUrl: `https://covers.openlibrary.org/b/isbn/${item.docs[0].isbn[0]}-M.jpg`,
+          }));
+          setSchoolBooks(formattedBooks);
           console.log('Текущие книгиIsbn:', schoolBooksIsbn);
-          console.log('Текущие книги:', items);
+          console.log('Текущие книги:', formattedBooks);
         } catch (error) {
           console.error(error);
         }
       };
+  
       fetchSchoolBooks();
     }
   }, [schoolBooksIsbn]);
+  
+  
 
   return (
     <div className="bookRow">
@@ -80,14 +72,14 @@ export default function BookFeed() {
         {books.length > 0 ? (
           books.map(book => (
             <Card key={book.isbn} className="bookContainer">
-              <img src={book.volumeInfo.coverUrl} alt={book.volumeInfo.title} />
+              <img src={book.coverUrl} alt={book.title} />
               <Meta
-                title={book.volumeInfo.title}
+                title={book.title}
                 description={book.searchInfo && book.searchInfo.textSnippet && (
                   <p>{book.searchInfo.textSnippet}</p>
                 )}
               />
-              <p>{book.volumeInfo.authors?.join(', ')}</p>
+              <p>{book.authors?.join(', ')}</p>
               <div className="buttonContainer">
                 <Button type="primary" onClick={() => bookAdd(book.isbn)}>Добавить в список книг</Button>
               </div>
@@ -101,14 +93,14 @@ export default function BookFeed() {
         {Array.isArray(schoolBooks) && schoolBooks.length > 0 ? (
           schoolBooks.map(book => (
             <Card key={book.id} className="bookContainer">
-              <img src={book.volumeInfo.coverUrl} alt={book.volumeInfo.title} />
+              <img src={book.coverUrl} alt={book.title} />
               <Meta
-                title={book.volumeInfo.title}
+                title={book.title}
                 description={book.searchInfo && book.searchInfo.textSnippet && (
                   <p>{book.searchInfo.textSnippet}</p>
                 )}
               />
-              <p>{book.volumeInfo.authors?.join(', ')}</p>
+              <p>{book.authors?.join(', ')}</p>
               <div className="buttonContainer">
                 <Button type="primary" onClick={() => bookAdd(book.isbn)}>Добавить в список книг</Button>
               </div>
