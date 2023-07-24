@@ -74,14 +74,20 @@ export default function BookFeed() {
       }
     });
   };
-  const [search, setSearch] = useState('Гарри Поттер');
+  const [bookName, setBookName] = useState('Garry Potter');
+  const [bookAuthor, setBookAuthor] = useState('Rowling');
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
-  const newValue = (value) => {
-    setSearch(value);
+  const newBookName = (value) => {
+    setBookName(value);
     console.log(value)
-    console.log(search)
+    console.log(bookName)
+  }
+  const newBookAuthor = (value) => {
+    setBookAuthor(value);
+    console.log(value)
+    console.log(bookAuthor)
   }
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
@@ -92,7 +98,7 @@ export default function BookFeed() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(`https://openlibrary.org/search.json?q=${search}`);
+        const response = await fetch(`https://openlibrary.org/search.json?title=${bookName}&author=${bookAuthor}`);
         const data = await response.json();
         const items = data.docs || [];
         setBooks(items.map(item => ({
@@ -108,7 +114,7 @@ export default function BookFeed() {
       }
     };
     fetchBooks();
-  }, [search]);
+  }, [bookName]);
 
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
@@ -140,12 +146,12 @@ export default function BookFeed() {
   return (
     <div className="bookRow">
       <div>
-        <Search placeholder="Введите название книги" onSearch={newValue} enterButton />
-        <Search placeholder="Введите Автора" onSearch={onSearch} enterButton />
+        <Search placeholder="Введите название книги" onSearch={newBookName} enterButton />
+        <Search placeholder="Введите Автора" onSearch={newBookAuthor} enterButton />
         <div>
           <p>Выберите год публикации</p>
           <Slider 
-          range defaultValue={[20, 50]}  
+          range defaultValue={[1984, 2023]} min={1700}  max={2023}
           />
         </div>
         <Menu mode="inline">{getMenuItems(items)}</Menu>
