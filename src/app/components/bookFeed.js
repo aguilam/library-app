@@ -76,20 +76,18 @@ export default function BookFeed() {
   };
   const [bookName, setBookName] = useState('Garry Potter');
   const [bookAuthor, setBookAuthor] = useState('Rowling');
+  const [publishYear, setPublishYear] = useState([2019,2023]);
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
   const newBookInfo = (values) => {
-    console.log(bookName)
-    console.log(bookAuthor)
     setBookName(values.bookname);
     setBookAuthor(values.authorname);
-    console.log(bookName)
-    console.log(bookAuthor)
-  }
-  const newBookAuthor = (value) => {
-    console.log(value)
-    console.log(bookAuthor)
+    setPublishYear(values.publishyear)
+    console.log(values.bookname)
+    console.log(values.authorname)
+    console.log(values.publishyear)
+    console.log(publishYear)
   }
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
@@ -100,7 +98,7 @@ export default function BookFeed() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(`https://openlibrary.org/search.json?title=${bookName}&author=${bookAuthor}`);
+        const response = await fetch(`https://openlibrary.org/search.json?title=${bookName}&author=${bookAuthor}&q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]`);
         const data = await response.json();
         const items = data.docs || [];
         setBooks(items.map(item => ({
@@ -150,10 +148,11 @@ export default function BookFeed() {
       <div>
         <Form
           onFinish={newBookInfo}
+          layout="vertical"
         >
           <Form.Item
-                label="Название книги"
-                name="bookname"
+            label="Название книги"
+            name="bookname"
           >
             <Input placeholder="Введите название книги"/>
           </Form.Item>
@@ -163,14 +162,16 @@ export default function BookFeed() {
           >
             <Input placeholder="Введите Автора"/>
           </Form.Item>
+          <Form.Item
+            label="Год публикации книги"
+            name="publishyear"
+          >
+            <Slider 
+              range defaultValue={[1984, 2023]} min={1700}  max={2023}
+            />
+          </Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
         </Form>
-        <div>
-          <p>Выберите год публикации</p>
-          <Slider 
-          range defaultValue={[1984, 2023]} min={1700}  max={2023}
-          />
-        </div>
         <Menu mode="inline">{getMenuItems(items)}</Menu>
       </div>
       <div className="bookColumn">
