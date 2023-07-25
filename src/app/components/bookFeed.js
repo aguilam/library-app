@@ -3,7 +3,7 @@ import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Skeleton } from 'antd';
 import SearchPanel from "./searchPanel";
-import { Checkbox, Input, Menu, Radio } from 'antd';
+import { Checkbox, Input, Menu, Radio, Form } from 'antd';
 import { Slider } from 'antd';
 const { Search } = Input;
 const { SubMenu } = Menu;
@@ -79,13 +79,15 @@ export default function BookFeed() {
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
-  const newBookName = (value) => {
-    setBookName(value);
-    console.log(value)
+  const newBookInfo = (values) => {
     console.log(bookName)
+    console.log(bookAuthor)
+    setBookName(values.bookname);
+    setBookAuthor(values.authorname);
+    console.log(bookName)
+    console.log(bookAuthor)
   }
   const newBookAuthor = (value) => {
-    setBookAuthor(value);
     console.log(value)
     console.log(bookAuthor)
   }
@@ -146,8 +148,23 @@ export default function BookFeed() {
   return (
     <div className="bookRow">
       <div>
-        <Search placeholder="Введите название книги" onSearch={newBookName} enterButton />
-        <Search placeholder="Введите Автора" onSearch={newBookAuthor} enterButton />
+        <Form
+          onFinish={newBookInfo}
+        >
+          <Form.Item
+                label="Название книги"
+                name="bookname"
+          >
+            <Input placeholder="Введите название книги"/>
+          </Form.Item>
+          <Form.Item
+            label="Имя автора"
+            name="authorname"
+          >
+            <Input placeholder="Введите Автора"/>
+          </Form.Item>
+          <Button type="primary" htmlType="submit">Submit</Button>
+        </Form>
         <div>
           <p>Выберите год публикации</p>
           <Slider 
