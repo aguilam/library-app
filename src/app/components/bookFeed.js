@@ -80,6 +80,9 @@ export default function BookFeed() {
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
+  let bookNameResponse = ''
+  let authorResponse = ''
+  const publishYearResponse = ''
   const newBookInfo = (values) => {
     setBookName(values.bookname);
     setBookAuthor(values.authorname);
@@ -87,18 +90,37 @@ export default function BookFeed() {
     console.log(values.bookname)
     console.log(values.authorname)
     console.log(values.publishyear)
-    console.log(publishYear)
   }
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
     setSchoolBooksIsbn(prevId => [...prevId, Identifiers]);
   };
-
+  const bookInfoCheck = () => {
+    if (!bookName) {
+      bookNameResponse = ''
+      console.log('Название книги не введено')
+    }
+    else {
+      bookNameResponse = `title=${bookName}&`
+      console.log(bookNameResponse)
+    }
+    if(!bookAuthor) {
+      authorResponse = ''
+      console.log('Автор не введён')
+    }
+    else{
+      authorResponse = `author=${bookAuthor}&`
+      console.log(authorResponse)
+    }
+    console.log(`https://openlibrary.org/search.json?${bookNameResponse}${authorResponse}`)
+  }
   
   useEffect(() => {
     const fetchBooks = async () => {
       try {
+        bookInfoCheck()
         const response = await fetch(`https://openlibrary.org/search.json?title=${bookName}&author=${bookAuthor}&q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]`);
+        console.log(response)
         const data = await response.json();
         const items = data.docs || [];
         setBooks(items.map(item => ({
