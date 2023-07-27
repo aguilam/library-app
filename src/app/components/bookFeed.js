@@ -76,16 +76,17 @@ export default function BookFeed() {
   };
   const [bookName, setBookName] = useState('Garry Potter');
   const [bookAuthor, setBookAuthor] = useState('Rowling');
-  const [publishYear, setPublishYear] = useState([2019,2023]);
+  const [publishYear, setPublishYear] = useState([1950,2023]);
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
   let bookNameResponse = ''
   let authorResponse = ''
-  const publishYearResponse = ''
+  let publishYearResponse = ''
+  let fullResponse = ''
   const newBookInfo = (values) => {
-    setBookName(values.bookname);
     setBookAuthor(values.authorname);
+    setBookName(values.bookname);
     setPublishYear(values.publishyear)
     console.log(values.bookname)
     console.log(values.authorname)
@@ -98,7 +99,6 @@ export default function BookFeed() {
   const bookInfoCheck = () => {
     if (!bookName) {
       bookNameResponse = ''
-      console.log('Название книги не введено')
     }
     else {
       bookNameResponse = `title=${bookName}&`
@@ -106,20 +106,21 @@ export default function BookFeed() {
     }
     if(!bookAuthor) {
       authorResponse = ''
-      console.log('Автор не введён')
     }
     else{
       authorResponse = `author=${bookAuthor}&`
       console.log(authorResponse)
     }
-    console.log(`https://openlibrary.org/search.json?${bookNameResponse}${authorResponse}`)
+    publishYearResponse = `q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]&`
+    fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}`)
+    console.log(fullResponse)
   }
   
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         bookInfoCheck()
-        const response = await fetch(`https://openlibrary.org/search.json?title=${bookName}&author=${bookAuthor}&q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]`);
+        const response = await fetch(fullResponse);
         console.log(response)
         const data = await response.json();
         const items = data.docs || [];
@@ -136,7 +137,7 @@ export default function BookFeed() {
       }
     };
     fetchBooks();
-  }, [bookName]);
+  }, [bookName, bookAuthor, publishYear]);
 
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
