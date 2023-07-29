@@ -3,7 +3,7 @@ import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Skeleton } from 'antd';
 import SearchPanel from "./searchPanel";
-import { Checkbox, Input, Menu, Radio, Form } from 'antd';
+import { Checkbox, Input, Menu, Radio, Form, Select } from 'antd';
 import { Slider } from 'antd';
 const { Search } = Input;
 const { SubMenu } = Menu;
@@ -77,6 +77,7 @@ export default function BookFeed() {
   const [bookName, setBookName] = useState('Garry Potter');
   const [bookAuthor, setBookAuthor] = useState('Rowling');
   const [publishYear, setPublishYear] = useState([1950,2023]);
+  const [bookGenres, setbookGenres] = useState([]);
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
@@ -84,13 +85,92 @@ export default function BookFeed() {
   let authorResponse = ''
   let publishYearResponse = ''
   let fullResponse = ''
+  let selectedGenres = []
+  getItem(<Checkbox>Фантастика</Checkbox>, '1'),
+  getItem(<Checkbox>Детектив</Checkbox>, '2'),
+  getItem(<Checkbox>Роман</Checkbox>, '3'),
+  getItem(<Checkbox>Фэнтези</Checkbox>, '4'),
+  getItem(<Checkbox>Приключения</Checkbox>, '5'),
+  getItem(<Checkbox>Ужасы</Checkbox>, '6'),
+  getItem(<Checkbox>Классика</Checkbox>, '7'),
+  getItem(<Checkbox>Исторический роман</Checkbox>, '8'),
+  getItem(<Checkbox>Научная литература</Checkbox>, '9'),
+  getItem(<Checkbox>Биография и автобиография</Checkbox>, '10')
+  const OPTIONS = 
+  [ 
+    {
+      value: 'fantasy',
+      label: 'Фэнтези',
+    },
+    {
+      value: 'historical_fiction',
+      label: 'Художественная история',
+    },
+    {
+      value: 'short_stories',
+      label: 'Рассказы',
+    },
+    {
+      value: 'science_fiction',
+      label: 'Научная фантастика',
+    },
+    {
+      value: 'romance',
+      label: 'Романы',
+    },
+    {
+      value: 'mystery_and_detective_stories',
+      label: 'Мистика и детективы',
+    },
+    {
+      value: 'magic',
+      label: 'Магия',
+    },
+    {
+      value: 'literature',
+      label: 'Классика',
+    },
+    {
+      value: 'young_adult_fiction',
+      label: 'Подростковая литература',
+    },
+    {
+      value: 'poetry',
+      label: 'Поэзия',
+    },
+    {
+      value: 'horror',
+      label: 'Ужасы',
+    },
+    {
+      value: 'humor',
+      label: 'Юмор',
+    },
+    {
+      value: 'plays',
+      label: 'Пьесы',
+    },
+    {
+      value: 'thriller',
+      label: 'Триллеры',
+    },
+  ];
+  const filteredOptions = {
+    options: OPTIONS,
+    filterBySelected: function(selectedItems) {
+      return this.options.filter((o) => !selectedItems.includes(o.value));
+    },
+  };
+  
   const newBookInfo = (values) => {
     setBookAuthor(values.authorname);
     setBookName(values.bookname);
     setPublishYear(values.publishyear)
+    setbookGenres(values.genre)
     console.log(values.bookname)
     console.log(values.authorname)
     console.log(values.publishyear)
+    console.log(values.genre)
   }
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
@@ -111,8 +191,15 @@ export default function BookFeed() {
       authorResponse = `author=${bookAuthor}&`
       console.log(authorResponse)
     }
+    if (!bookGenres) {
+      selectedGenres = []
+    }
+    else{
+      selectedGenres = bookGenres.map((genre) => `subject=${genre}`).join('&') + '&'
+    }
+    console.log(selectedGenres)
     publishYearResponse = `q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]&`
-    fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}`)
+    fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}${selectedGenres}`)
     console.log(fullResponse)
   }
   
@@ -130,14 +217,14 @@ export default function BookFeed() {
           authors: item.author_name,
           searchInfo: item.searchInfo,
           isbn: item.isbn && item.isbn[1],
-          coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]  }-M.jpg`,
+          coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]}-M.jpg`,
         })));
       } catch (error) {
         console.error(error);
       }
     };
     fetchBooks();
-  }, [bookName, bookAuthor, publishYear]);
+  }, [bookName, bookAuthor, publishYear, bookGenres]);
 
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
@@ -193,9 +280,21 @@ export default function BookFeed() {
               range defaultValue={[1984, 2023]} min={1700}  max={2023}
             />
           </Form.Item>
+          <Form.Item
+            name="genre"
+            label="Жанры"
+          >
+          <Select
+            mode="multiple"
+            placeholder="Выберите жанры"
+            style={{
+              width: '100%',
+            }}
+            options={OPTIONS}
+          />
+          </Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
         </Form>
-        <Menu mode="inline">{getMenuItems(items)}</Menu>
       </div>
       <div className="bookColumn">
         {books.length > 0 ? (
