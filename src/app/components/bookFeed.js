@@ -78,58 +78,71 @@ export default function BookFeed() {
   const [bookAuthor, setBookAuthor] = useState('Rowling');
   const [publishYear, setPublishYear] = useState([1950,2023]);
   const [bookGenres, setbookGenres] = useState([]);
+  const [bookPlaces, setbookPlaces] = useState([]);
   const [books, setBooks] = useState([]);
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
+  const { SHOW_PARENT } = TreeSelect;
   let bookNameResponse = ''
   let authorResponse = ''
   let publishYearResponse = ''
   let fullResponse = ''
+  let selectedPlaces = ''
   let selectedGenres = []
   const treeData = [
     {
       value: 'britain',
       title: 'Британия',
+      key: '0-0',
       children: [
         {
           value: 'england',
           title: 'Англия',
+          key: '0-1',
           children: [
             {
               value: 'london',
               title: 'Лондон',
+              key: '0-2',
             },
             {
               value: 'oxford',
               title: 'Оксфорд',
+              key: '0-3',
             },
           ],
         },
         {
           value: 'wales',
           title: 'Уэльс',
+          key: '0-4',
           children: [
             {
               value: 'cardiff',
               title: 'Кардифф',
+              key: '0-5',
             },
             {
               value: 'monmuthur',
               title: 'Монмутшир',
+              key: '0-6',
             },
           ],
         },
         {
           value: 'scotland',
           title: 'Шотландия',
+          key: '0-7',
         },
         {
           value: 'ireland',
           title: 'Ирландия',
+          key: '0-8',
           children: [
             {
               value: 'leaf1',
               title: 'Дублин',
+              key: '0-9',
             },
           ],
         },
@@ -201,6 +214,7 @@ export default function BookFeed() {
     setBookName(values.bookname);
     setPublishYear(values.publishyear)
     setbookGenres(values.genre)
+    setbookPlaces(values.place)
     console.log(values.bookname)
     console.log(values.authorname)
     console.log(values.publishyear)
@@ -231,11 +245,19 @@ export default function BookFeed() {
     }
     else{
       selectedGenres = bookGenres.map((genre) => `subject=${genre}`).join('&') + '&'
+      console.log(selectedGenres)
     }
-    console.log(selectedGenres)
+    if (!bookPlaces) {
+      selectedPlaces = []
+    }
+    else{
+      selectedPlaces = bookPlaces.map((place) => `q=place:${place}`).join('&') + '&'
+      console.log(selectedPlaces)
+    }
     publishYearResponse = `q=first_publish_year:[${publishYear[0]}+TO+${publishYear[1]}]&`
-    fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}${selectedGenres}`)
+    fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}${selectedGenres}${selectedPlaces}`)
     console.log(fullResponse)
+    console.log("dfe")
   }
   
   useEffect(() => {
@@ -259,7 +281,7 @@ export default function BookFeed() {
       }
     };
     fetchBooks();
-  }, [bookName, bookAuthor, publishYear, bookGenres]);
+  }, [bookName, bookAuthor, publishYear, bookGenres, bookPlaces]);
 
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
@@ -286,7 +308,15 @@ export default function BookFeed() {
     }
   }, [schoolBooksIsbn]);
   
-  
+  const tProps = {
+    treeData,
+    treeCheckable: true,
+    showCheckedStrategy: SHOW_PARENT,
+    placeholder: 'Please select',
+    style: {
+      width: '100%',
+    },
+  };
 
   return (
     <div className="bookRow">
@@ -332,20 +362,7 @@ export default function BookFeed() {
             name="place"
             label="Места"
           >
-            <TreeSelect
-              showSearch
-              style={{
-                width: '100%',
-              }}
-              dropdownStyle={{
-                maxHeight: 400,
-                overflow: 'auto',
-              }}
-              multiple
-              placeholder="Выберите место действия книги"
-              allowClear
-              treeData={treeData}
-            />
+            <TreeSelect {...tProps} />
           </Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
         </Form>
