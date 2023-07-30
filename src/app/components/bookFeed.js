@@ -3,7 +3,7 @@ import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Skeleton } from 'antd';
 import SearchPanel from "./searchPanel";
-import { Checkbox, Input, Menu, Radio, Form, Select } from 'antd';
+import { Checkbox, Input, Menu, Radio, Form, Select, TreeSelect } from 'antd';
 import { Slider } from 'antd';
 const { Search } = Input;
 const { SubMenu } = Menu;
@@ -86,16 +86,56 @@ export default function BookFeed() {
   let publishYearResponse = ''
   let fullResponse = ''
   let selectedGenres = []
-  getItem(<Checkbox>Фантастика</Checkbox>, '1'),
-  getItem(<Checkbox>Детектив</Checkbox>, '2'),
-  getItem(<Checkbox>Роман</Checkbox>, '3'),
-  getItem(<Checkbox>Фэнтези</Checkbox>, '4'),
-  getItem(<Checkbox>Приключения</Checkbox>, '5'),
-  getItem(<Checkbox>Ужасы</Checkbox>, '6'),
-  getItem(<Checkbox>Классика</Checkbox>, '7'),
-  getItem(<Checkbox>Исторический роман</Checkbox>, '8'),
-  getItem(<Checkbox>Научная литература</Checkbox>, '9'),
-  getItem(<Checkbox>Биография и автобиография</Checkbox>, '10')
+  const treeData = [
+    {
+      value: 'britain',
+      title: 'Британия',
+      children: [
+        {
+          value: 'england',
+          title: 'Англия',
+          children: [
+            {
+              value: 'london',
+              title: 'Лондон',
+            },
+            {
+              value: 'oxford',
+              title: 'Оксфорд',
+            },
+          ],
+        },
+        {
+          value: 'wales',
+          title: 'Уэльс',
+          children: [
+            {
+              value: 'cardiff',
+              title: 'Кардифф',
+            },
+            {
+              value: 'monmuthur',
+              title: 'Монмутшир',
+            },
+          ],
+        },
+        {
+          value: 'scotland',
+          title: 'Шотландия',
+        },
+        {
+          value: 'ireland',
+          title: 'Ирландия',
+          children: [
+            {
+              value: 'leaf1',
+              title: 'Дублин',
+            },
+          ],
+        },
+      ],
+    },
+  ];
   const OPTIONS = 
   [ 
     {
@@ -155,12 +195,6 @@ export default function BookFeed() {
       label: 'Триллеры',
     },
   ];
-  const filteredOptions = {
-    options: OPTIONS,
-    filterBySelected: function(selectedItems) {
-      return this.options.filter((o) => !selectedItems.includes(o.value));
-    },
-  };
   
   const newBookInfo = (values) => {
     setBookAuthor(values.authorname);
@@ -171,6 +205,7 @@ export default function BookFeed() {
     console.log(values.authorname)
     console.log(values.publishyear)
     console.log(values.genre)
+    console.log(values.place)
   }
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
@@ -284,14 +319,33 @@ export default function BookFeed() {
             name="genre"
             label="Жанры"
           >
-          <Select
-            mode="multiple"
-            placeholder="Выберите жанры"
-            style={{
-              width: '100%',
-            }}
-            options={OPTIONS}
-          />
+            <Select
+              mode="multiple"
+              placeholder="Выберите жанры"
+              style={{
+                width: '100%',
+              }}
+              options={OPTIONS}
+            />
+          </Form.Item>
+          <Form.Item
+            name="place"
+            label="Места"
+          >
+            <TreeSelect
+              showSearch
+              style={{
+                width: '100%',
+              }}
+              dropdownStyle={{
+                maxHeight: 400,
+                overflow: 'auto',
+              }}
+              multiple
+              placeholder="Выберите место действия книги"
+              allowClear
+              treeData={treeData}
+            />
           </Form.Item>
           <Button type="primary" htmlType="submit">Submit</Button>
         </Form>
