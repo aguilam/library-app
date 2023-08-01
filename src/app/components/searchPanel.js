@@ -3,7 +3,7 @@ import "./css/bookFeed.css";
 import React, { useState } from 'react';
 import {Input, Form, Select, TreeSelect, Button, Slider } from 'antd';
 
-const Bg = ({ onFinish}) => {
+const Bg = ({ onFinish }) => {
 
   const [bookName, setBookName] = useState('');
   const [bookAuthor, setBookAuthor] = useState('');
@@ -64,7 +64,7 @@ const Bg = ({ onFinish}) => {
           key: '0-8',
           children: [
             {
-              value: 'leaf1',
+              value: 'dublin',
               title: 'Дублин',
               key: '0-9',
             },
@@ -73,6 +73,7 @@ const Bg = ({ onFinish}) => {
       ],
     },
   ];
+  /* Данные о местах*/
   const OPTIONS = 
   [ 
     {
@@ -132,13 +133,14 @@ const Bg = ({ onFinish}) => {
       label: 'Триллеры',
     },
   ];
-  
+  /* Данные о жанрах*/
   const newBookInfo = async (values) => {
     await setBookAuthor(values.authorname);
     await setBookName(values.bookname);
     await setPublishYear(values.publishyear);
     await setbookGenres(values.genre);
     await setbookPlaces(values.place);
+      /* Присвоение данных полученных при нажатии кнопки из формы*/
     console.log(values.authorname)
     console.log(values.bookname)
     console.log(values.publishyear)
@@ -149,6 +151,7 @@ const Bg = ({ onFinish}) => {
     console.log(publishYear)
     console.log(bookGenres)
     console.log(bookPlaces)
+    /* Проверка и создание запроса который будет отправлен в bookfeed*/
     if (!bookName) {
       bookNameResponse = ''
     }
@@ -186,8 +189,9 @@ const Bg = ({ onFinish}) => {
     fullResponse = (`https://openlibrary.org/search.json?${authorResponse}${bookNameResponse}${publishYearResponse}${selectedGenres}${selectedPlaces}`)
     console.log('Это запрос из панели'+fullResponse)
     onFinish(fullResponse)
+    /* Функция полученная из bookfeed для передачи туда запроса*/
   }
-  
+  /* эта функция вызывается при нажатии кнопки в форме*/
   const tProps = {
     treeData,
     treeCheckable: true,
@@ -197,7 +201,7 @@ const Bg = ({ onFinish}) => {
       width: '100%',
     },
   };
-
+  /* Информация о настройке выбора мест*/
   return (
     <div className="bookRow">
       <div>

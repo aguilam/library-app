@@ -2,7 +2,7 @@
 import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Skeleton } from 'antd';
-import Bg from "./searchPanel";
+import Bg  from "./searchPanel";
 
 const { Meta } = Card;
 
@@ -17,6 +17,7 @@ export default function bookFeed() {
     setfullResponse(respon)
     console.log('Это запрос из фида'+fullResponse)
   }
+  /* Функция которая получает данные из поисковой панели */
   const bookAdd = (Identifiers) => {
     console.log('Добавлена книга:', Identifiers);
     setSchoolBooksIsbn(prevId => [...prevId, Identifiers]);
@@ -43,7 +44,7 @@ export default function bookFeed() {
     };
     fetchBooks();
   }, [fullResponse]);
-
+  /* Поиск по данным о книге */
   useEffect(() => {
     if (schoolBooksIsbn.length > 0) {
       const fetchSchoolBooks = async () => {
@@ -68,7 +69,7 @@ export default function bookFeed() {
       fetchSchoolBooks();
     }
   }, [schoolBooksIsbn]);
-
+  /* Поиск по isbn */
   return (
     <div className="bookRow">
       <div>
