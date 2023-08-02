@@ -3,6 +3,7 @@ import "./css/bookFeed.css";
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Skeleton } from 'antd';
 import Bg  from "./searchPanel";
+import BookInfoDialog from "./bookInfoDialog";
 
 const { Meta } = Card;
 
@@ -12,6 +13,7 @@ export default function bookFeed() {
   let [fullResponse, setfullResponse] = useState('');
   const [schoolBooks, setSchoolBooks] = useState([]);
   const [schoolBooksIsbn, setSchoolBooksIsbn] = useState([]);
+  const [showBookDialog, setShowBookDialog] = useState(false)
 
   const onFini = (respon) =>{
     setfullResponse(respon)
@@ -22,7 +24,11 @@ export default function bookFeed() {
     console.log('Добавлена книга:', Identifiers);
     setSchoolBooksIsbn(prevId => [...prevId, Identifiers]);
   };
-  
+  const bookDialog = () => {
+    return (
+      showBookDialog && <BookInfoDialog data={bookData}/>
+    );
+  };
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -78,7 +84,15 @@ export default function bookFeed() {
       <div className="bookColumn">
         {books.length > 0 ? (
           books.map(book => (
-            <Card key={book.isbn} className="bookContainer">
+            <Card 
+            key={book.isbn} 
+            onClick={() => {
+              setShowBookDialog(true);
+            }} 
+            style={{ cursor: 'pointer' }} 
+            className="bookContainer"
+            >
+                      {showBookDialog && <BookInfoDialog data={book} />}
               <img src={book.coverUrl} alt={book.title} />
               <Meta
                 title={book.title}
