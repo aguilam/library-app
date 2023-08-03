@@ -22,51 +22,42 @@ const Bg = ({ onFinish }) => {
         {
           value: 'england',
           title: 'Англия',
-          key: '0-1',
           children: [
             {
               value: 'london',
               title: 'Лондон',
-              key: '0-2',
             },
             {
               value: 'oxford',
               title: 'Оксфорд',
-              key: '0-3',
             },
           ],
         },
         {
           value: 'wales',
           title: 'Уэльс',
-          key: '0-4',
           children: [
             {
               value: 'cardiff',
               title: 'Кардифф',
-              key: '0-5',
             },
             {
               value: 'monmuthur',
               title: 'Монмутшир',
-              key: '0-6',
             },
           ],
         },
         {
           value: 'scotland',
           title: 'Шотландия',
-          key: '0-7',
         },
         {
           value: 'ireland',
           title: 'Ирландия',
-          key: '0-8',
           children: [
             {
               value: 'dublin',
               title: 'Дублин',
-              key: '0-9',
             },
           ],
         },

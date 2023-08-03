@@ -40,8 +40,10 @@ export default function bookFeed() {
           id: item.key,
           title: item.title,
           authors: item.author_name,
-          searchInfo: item.searchInfo,
+          ratingsAverage: item.ratings_average,
           isbn: item.isbn && item.isbn[1],
+          publishYear: item.publish_year,
+          pages: item.number_of_pages_median,
           coverUrl: `https://covers.openlibrary.org/b/isbn/${item.isbn && item.isbn[0]}-M.jpg`,
         })));
       } catch (error) {
@@ -61,7 +63,6 @@ export default function bookFeed() {
             id: item.docs[0].key,
             title: item.docs[0].title,
             authors: item.docs[0].author_name,
-            searchInfo: item.docs[0].searchInfo,
             coverUrl: `https://covers.openlibrary.org/b/isbn/${item.docs[0].isbn[0]}-M.jpg`,
           }));
           setSchoolBooks(formattedBooks);
@@ -85,14 +86,15 @@ export default function bookFeed() {
         {books.length > 0 ? (
           books.map(book => (
             <Card 
-            key={book.isbn} 
-            onClick={() => {
-              setShowBookDialog(true);
-            }} 
-            style={{ cursor: 'pointer' }} 
-            className="bookContainer"
+              key={book.isbn} 
+              onClick={() => {
+                setShowBookDialog(true);
+                
+              }} 
+              style={{ cursor: 'pointer' }} 
+              className="bookContainer"
             >
-                      {showBookDialog && <BookInfoDialog data={book} />}
+              {showBookDialog && <BookInfoDialog data={book} />}
               <img src={book.coverUrl} alt={book.title} />
               <Meta
                 title={book.title}
