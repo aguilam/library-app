@@ -3,20 +3,36 @@ import React, { useState } from 'react';
 import { Menu } from 'antd';
 const items = [
   {
-    label: 'Navigation One',
-    key: 'mail',
+    label: (
+      <a href="#" target="_blank" rel="noopener noreferrer">
+        Лента
+      </a>
+    ),
+    key: 'feed',
   },
   {
-    label: 'Navigation Two',
-    key: 'app',
+    label: (
+      <a href="/librarian" target="_blank" rel="noopener noreferrer">
+        Лента книг
+      </a>
+    ),
+    key: 'bookfeed',
   },
   {
     label: (
       <a href="#" target="_blank" rel="noopener noreferrer">
-        Navigation Three
+        Школа
       </a>
     ),
-    key: 'alipay',
+    key: 'school',
+  },
+  {
+    label: (
+      <a href="#" target="_blank" rel="noopener noreferrer">
+        Профиль
+      </a>
+    ),
+    key: 'profile',
   },
 ];
 const Header = () => {
